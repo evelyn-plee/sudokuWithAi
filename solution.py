@@ -1,4 +1,6 @@
 assignments = []
+rows = 'ABCDEFGHI'
+cols = '123456789'
 
 def assign_value(values, box, value):
     """
@@ -23,24 +25,37 @@ def naked_twins(values):
     Returns:
         the values dictionary with the naked twins eliminated from peers.
     """
-
+    for unit in unit_list:
+        unsolved = [b for b in unit if len(values[b]) > 1]
+        unsolved_values = [values[b] for b in unsolved]
+        c = collections.Counter()
+        c.update(unsolved_values)
     # Find all instances of naked twins
+    twins = [value for value in c.keys() if (len(value)==2) and (c[value]==2)]
+    twin_digits = [x for i in twins for x in i]
     # Eliminate the naked twins as possibilities for their peers
+    for b in unsolved:
+        digits = values[b]
+        if len(digits) > 1:
+            for digit in digits:
+                if ("".join(sorted(digits)) not in twins) and (digit in twin_digits):
+                    assign_value(values, box, values[b].replace(digit,""))
+
 
 def cross(A, B):
     "Cross product of elements in A and elements in B."
     return [A+B for i in A for j in B]
 
-rows = 'ABCDEFGHI'
-cols = '123456789'
+
 boxes = cross(row, cols)
 
-rowUnits = [cross[r, cols] for r in rows]
-colUnits = [cross[rows, c] for c in cols]
-squareUnits = [cross[r,c] for r in ('ABC', 'DEF', 'GHI') for c in ('123','456','789')]
-unitList = rowUnits + colUnits + squareUnits
+row_units = [cross[r, cols] for r in rows]
+col_units = [cross[rows, c] for c in cols]
+square_units = [cross[r,c] for r in ('ABC', 'DEF', 'GHI') for c in ('123','456','789')]
+diagonal_units = [a+b for a,b in zip(list(rows), list(cols))], [a+b, for a,b in zip(list(rows), list(cols[::-1]))]
+unit_list = row_units + col_units + square_units + diagonal_units
 
-units = dict((b, [u for u in unitList if b in u]) for b in boxes)
+units = dict((b, [u for u in unit_list if b in u]) for b in boxes)
 peers = dict((b, set(sum(units[b],[]))-set([b])) for b in boxes)
 
 def grid_values(grid):
@@ -82,7 +97,7 @@ def eliminate(values):
     return values
 
 def only_choice(values):
-    for unit in unitlist:
+    for unit in unit_list:
         for digit in '123456789':
             dPlaces = [cell for cell in unit if digit in values[cell]]
             if len(dPlaces) == 1:
