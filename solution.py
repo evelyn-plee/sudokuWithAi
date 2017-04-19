@@ -25,22 +25,17 @@ def naked_twins(values):
     Returns:
         the values dictionary with the naked twins eliminated from peers.
     """
-    for unit in unit_list:
-        unsolved = [b for b in unit if len(values[b]) > 1]
-        unsolved_values = [values[b] for b in unsolved]
-        c = collections.Counter()
-        c.update(unsolved_values)
-    # Find all instances of naked twins
-    twins = [value for value in c.keys() if (len(value)==2) and (c[value]==2)]
-    twin_digits = [x for i in twins for x in i]
-    # Eliminate the naked twins as possibilities for their peers
-    for b in unsolved:
-        digits = values[b]
-        if len(digits) > 1:
-            for digit in digits:
-                if ("".join(sorted(digits)) not in twins) and (digit in twin_digits):
-                    assign_value(values, box, values[b].replace(digit,""))
-
+    twins = [b for b in values.keys() if len(values[b])==2]
+    naked_twins = [[b1, b2] for b1 in twins for b2 in peers[b1] if set(values[b1])==set(values[b2]) ]
+    for i in range(len(naked_twins)):
+        b1 = naked_twins[i][0]
+        b2 = naked_twins[i][1]
+        common_peers = set(peers[b1]) & set(peers[b2])
+        for peer in common_peers:
+            if len(values[peer]) > 2:
+                for repeat_val in values[b1]:
+                    values = assign_value(values, peer, values[peer].replace(repeat_val,''))
+    return values
 
 def cross(A, B):
     "Cross product of elements in A and elements in B."
