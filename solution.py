@@ -17,26 +17,6 @@ def assign_value(values, box, value):
         assignments.append(values.copy())
     return values
 
-def naked_twins(values):
-    """Eliminate values using the naked twins strategy.
-    Args:
-        values(dict): a dictionary of the form {'box_name': '123456789', ...}
-
-    Returns:
-        the values dictionary with the naked twins eliminated from peers.
-    """
-    twins = [b for b in values.keys() if len(values[b])==2]
-    naked_twins = [[b1, b2] for b1 in twins for b2 in peers[b1] if set(values[b1])==set(values[b2]) ]
-    for i in range(len(naked_twins)):
-        b1 = naked_twins[i][0]
-        b2 = naked_twins[i][1]
-        common_peers = set(peers[b1]) & set(peers[b2])
-        for peer in common_peers:
-            if len(values[peer]) > 2:
-                for repeat_val in values[b1]:
-                    values = assign_value(values, peer, values[peer].replace(repeat_val,''))
-    return values
-
 def cross(A, B):
     "Cross product of elements in A and elements in B."
     return [A+B for i in A for j in B]
@@ -88,7 +68,7 @@ def eliminate(values):
     for cell in solved_cells:
         digit = values[cell]
         for peer in peers[cell]:
-            values[cell] = values[peer].replace(digit, '')
+            values = assign_value(values, peer, values[peer].replace(digit,''))
     return values
 
 def only_choice(values):
@@ -96,7 +76,27 @@ def only_choice(values):
         for digit in '123456789':
             dPlaces = [cell for cell in unit if digit in values[cell]]
             if len(dPlaces) == 1:
-                values[dPlaces[0]] = digit
+                values = assign_value(values, dPlaces[0], digit)
+    return values
+
+def naked_twins(values):
+    """Eliminate values using the naked twins strategy.
+    Args:
+        values(dict): a dictionary of the form {'box_name': '123456789', ...}
+
+    Returns:
+        the values dictionary with the naked twins eliminated from peers.
+    """
+    twins = [b for b in values.keys() if len(values[b])==2]
+    naked_twins = [[b1, b2] for b1 in twins for b2 in peers[b1] if set(values[b1])==set(values[b2]) ]
+    for i in range(len(naked_twins)):
+        b1 = naked_twins[i][0]
+        b2 = naked_twins[i][1]
+        common_peers = set(peers[b1]) & set(peers[b2])
+        for peer in common_peers:
+            if len(values[peer]) > 2:
+                for repeat_val in values[b1]:
+                    values = assign_value(values, peer, values[peer].replace(repeat_val,''))
     return values
 
 def reduce_puzzle(values):
@@ -106,6 +106,7 @@ def reduce_puzzle(values):
         solved_values_before = len([b for b in values.keys() if len(values[b])==1])
         values = eliminate(values)
         values = only_choice(values)
+        values = naked_twins(values)
         solved_values_after = len([b for b in values.keys() if len(values[b])==1])
         stalled = solved_values_before == solved_values_after
         if len([b for b in values.keys() if len(values[b])==0]):
@@ -138,7 +139,9 @@ def solve(grid):
     return search(grid_values(grid))
 
 if __name__ == '__main__':
-    diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    #diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    diag_sudoku_grid= '9.1....8.8.5.7..4.2.4....6...7......5..............83.3..6......9................'
+    display(grid_values(diag_sudoku_grid))
     display(solve(diag_sudoku_grid))
 
     try:
