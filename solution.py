@@ -27,6 +27,7 @@ boxes = cross(rows, cols)
 row_units = [cross(r, cols) for r in rows]
 col_units = [cross(rows, c) for c in cols]
 square_units = [cross(r,c) for r in ('ABC', 'DEF', 'GHI') for c in ('123','456','789')]
+# contains 2 list of diagonal elements ranging from A1-I9 and I1-A9
 diagonal_units = [[a[0]+a[1] for a in zip(rows, cols)], [a[0]+a[1] for a in zip(rows, cols[::-1])]]
 unit_list = row_units + col_units + square_units + diagonal_units
 
@@ -87,11 +88,16 @@ def naked_twins(values):
     Returns:
         the values dictionary with the naked twins eliminated from peers.
     """
+    # find all possible twins with the length of 2
     twins = [b for b in values.keys() if len(values[b])==2]
+    # group identical boxes
     naked_twins = [[b1, b2] for b1 in twins for b2 in peers[b1] if set(values[b1])==set(values[b2]) ]
+    # loop through each pair of naked twins
     for i in range(len(naked_twins)):
         b1 = naked_twins[i][0]
         b2 = naked_twins[i][1]
+        # find the common peers by using set intersection, then remove the repeated
+        # 2 digits from the common peers
         common_peers = set(peers[b1]) & set(peers[b2])
         for peer in common_peers:
             if len(values[peer]) > 2:

@@ -10,8 +10,8 @@ A: 1. Identify all the twins with length of two, then together with its peers th
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: I added diagonal units as part of the unit list, together with other initial
-   row units, column units and square units.
+A: Each digit from 1-9 can occur only once across the two diagonals in a sudoku.
+   1. Perform elimination, one choice and search to reduce the possibilities in boxes
 
 ### Install
 
