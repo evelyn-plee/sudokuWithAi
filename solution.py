@@ -47,12 +47,12 @@ def cross(A, B):
     return [A+B for i in A for j in B]
 
 
-boxes = cross(row, cols)
+boxes = cross(rows, cols)
 
-row_units = [cross[r, cols] for r in rows]
-col_units = [cross[rows, c] for c in cols]
-square_units = [cross[r,c] for r in ('ABC', 'DEF', 'GHI') for c in ('123','456','789')]
-diagonal_units = [a+b for a,b in zip(list(rows), list(cols))], [a+b, for a,b in zip(list(rows), list(cols[::-1]))]
+row_units = [cross(r, cols) for r in rows]
+col_units = [cross(rows, c) for c in cols]
+square_units = [cross(r,c) for r in ('ABC', 'DEF', 'GHI') for c in ('123','456','789')]
+diagonal_units = [[a[0]+a[1] for a in zip(rows, cols)], [a[0]+a[1] for a in zip(rows, cols[::-1])]]
 unit_list = row_units + col_units + square_units + diagonal_units
 
 units = dict((b, [u for u in unit_list if b in u]) for b in boxes)
@@ -70,7 +70,7 @@ def grid_values(grid):
     """
     board = dict((boxes[i], grid[i]) for i in range(len(grid)))
     for b in board:
-        if board[b] == '.'
+        if board[b] == '.':
             board[b] = '123456789'
     return board
 
@@ -89,7 +89,7 @@ def display(values):
     return
 
 def eliminate(values):
-    solved_cells = [for cell in values.keys() if len(values[cell]) == 1]
+    solved_cells = [cell for cell in values.keys() if len(values[cell]) == 1]
     for cell in solved_cells:
         digit = values[cell]
         for peer in peers[cell]:
